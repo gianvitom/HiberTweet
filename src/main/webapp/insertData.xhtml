@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"  
+      xmlns:h="http://java.sun.com/jsf/html"  
+      xmlns:f="http://java.sun.com/jsf/core"  
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:ph="http://xmlns.jcp.org/jsf/passthrough"
+      xmlns:pe="http://primefaces.org/ui/extensions"
+      xmlns:p="http://primefaces.org/ui">
+               
+        <h1 class="page-header "> <i class="fa fa-edit"></i> Inserimento dei dati nel DB </h1>
+
+        <h:form id="insert_comment_box" class="navbar-left" >
+            <p:growl id="messages" showDetail="true" life="3000" />
+            
+            <fieldset>
+                
+                <div class="form-group">
+                    <label for="nomeautore"> Nome dell'autore </label>
+                    <h:inputText class="form-control" id="nomeautore" ph:placeholder="Nome dell'autore..." value="#{commentDAO.author}"/>
+                </div>
+                <div class="form-group">
+                    <label for="topiccomm"> Topic </label>
+                    <h:inputText class="form-control" id="topiccomm" ph:placeholder="Topic..." value="#{commentDAO.topic}"/>
+                </div>
+                <div class="form-group">
+                    <label for="testocomm"> Testo </label>
+                    <h:inputText class="form-control" id="testocomm" ph:placeholder="Testo..." value="#{commentDAO.text}"/>
+                </div>
+
+                <p:commandButton  value="Inserisci il commento" type="submit" class="btn btn-default" action="#{commentDAO.insertComment()}" 
+                                   update=":insert_comment_box:messages">
+                    <f:ajax render="nomeautore topiccomm testocomm" execute="@form" />
+                </p:commandButton>
+
+            </fieldset>
+        </h:form>
+    
+</html>

@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="com.gianvito.comment.Comment" table="Comment">
+        <id name="id" type="java.lang.Integer">
+            <column name="id" precision="5" scale="0" />
+            <generator class="identity" />
+        </id>
+        <property name="topic" type="string">
+            <column name="topic" length="20" not-null="true" />
+        </property>
+        <property name="autore" type="string">
+            <column name="autore" length="20" not-null="true" />
+        </property>
+        <property name="testo" type="string">
+            <column name="testo" length="20" not-null="true" />
+        </property>
+        <property name="publicationDate" type="date">
+            <column name="data" length="7" not-null="true" />
+        </property>
+    </class>
+</hibernate-mapping>

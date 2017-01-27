@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"  
+      xmlns:h="http://java.sun.com/jsf/html"  
+      xmlns:f="http://java.sun.com/jsf/core"  
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:ph="http://xmlns.jcp.org/jsf/passthrough"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:pe="http://primefaces.org/ui/extensions">
+               
+    <h1 class="page-header "> <i class="fa fa-list"></i> Mostra dati salvati all'interno del DB </h1>    
+    <h:form id="searchbox" class="form-inline" >
+        <p:growl id="messages" showDetail="true" life="3000" />
+        
+        <fieldset>            
+            <div class="form-group">
+                <p:commandButton value="Carica i primi dati" id="loadallbutton" ajax="true" update=":dbform:tabs:dataDB :dbform:tabs:dataCommentDB :searchbox:messages" class="btn btn-default" actionListener="#{loadDB.loadAll()}">
+                   <f:ajax render=":tblDB" execute="@form" />
+                </p:commandButton>
+            </div>
+            <div class="form-group">
+                <p:commandButton value="Cancella tutto" id="deleteallbutton" ajax="true" update=":dbform :searchbox:messages" class="btn btn-default" actionListener="#{loadDB.deleteAll()}">
+                   <f:ajax render=":tblDB" execute="@form" />
+                </p:commandButton>
+            </div>
+            <p:spacer width="50"></p:spacer>
+            <h:selectOneMenu value="#{loadDB.entity}" required="true" >
+                <f:selectItem itemLabel="Tweet (default)" itemValue="tweet" />
+                <f:selectItem itemLabel="Comment" itemValue="comment" />
+            </h:selectOneMenu>            
+            
+        </fieldset>
+    </h:form>
+    <br></br>
+    
+    <h:form id ="dbform">
+        <p:tabView id="tabs">
+            <p:tab title="Tweet">
+                <p:dataTable id="dataDB" var="tweet" value="#{loadDB.tweets}"
+                 paginatorTemplate="{Save} {CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                 paginator="true" rows="10" style="margin-bottom:20px">
+                    
+                    <p:column width="170">
+                        <f:facet name="header">
+                            <h:outputText value="Id" />
+                        </f:facet>
+                        <h:outputText value="#{tweet.id}" />
+                    </p:column>
+
+                    <p:column width="150">
+                        <f:facet name="header">
+                            <h:outputText value="Data"/>
+                        </f:facet>
+                        <h:outputText value="#{tweet.createdAt}" />
+                    </p:column>
+
+                    <p:column width="150">
+                        <f:facet name="header">
+                            <h:outputText value="Utente" />
+                        </f:facet>
+                        <h:outputText value="#{tweet.utente}" />
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Testo" />
+                        </f:facet>
+                        <h:outputText value="#{tweet.testo}" />
+                    </p:column>
+
+                    <f:facet name="{Save}">
+                        <p:spacer width="10"></p:spacer>  
+                        <p:commandLink process="dataDB" update=":dbform" ajax="true" actionListener="#{loadDB.continueLoadingTweets()}" style="float: none">
+                            <div class="fa fa-angle-right" width="24"/> Altri tweet
+                        </p:commandLink>
+                    </f:facet>
+                </p:dataTable>
+            </p:tab>
+            <p:tab title="Comment">
+                <p:dataTable id="dataCommentDB" var="comment" value="#{loadDB.comments}"
+                 paginatorTemplate="{Save} {CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                 paginator="true" rows="10" style="margin-bottom:20px">
+                    
+                    <p:column width="170">
+                        <f:facet name="header">
+                            <h:outputText value="Id" />
+                        </f:facet>
+                        <h:outputText value="#{comment.id}" />
+                    </p:column>
+
+                    <p:column width="150">
+                        <f:facet name="header">
+                            <h:outputText value="Data"/>
+                        </f:facet>
+                        <h:outputText value="#{comment.publicationDate}" />
+                    </p:column>
+
+                    <p:column width="150">
+                        <f:facet name="header">
+                            <h:outputText value="Utente" />
+                        </f:facet>
+                        <h:outputText value="#{comment.autore}" />
+                    </p:column>
+                    
+                    <p:column width="150">
+                        <f:facet name="header">
+                            <h:outputText value="Topic" />
+                        </f:facet>
+                        <h:outputText value="#{comment.topic}" />
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Testo" />
+                        </f:facet>
+                        <h:outputText value="#{comment.testo}" />
+                    </p:column>
+
+                    <f:facet name="{Save}">
+                        <p:spacer width="10"></p:spacer>  
+                        <p:commandLink process="dataCommentDB" update=":dbform" ajax="true" actionListener="#{loadDB.continueLoadingComments()}" style="float: none">
+                            <div class="fa fa-angle-right" width="24"/> Altri commenti
+                        </p:commandLink>
+                    </f:facet>
+                </p:dataTable>
+            </p:tab>
+        </p:tabView>
+        
+    </h:form>
+    
+    
+</html>

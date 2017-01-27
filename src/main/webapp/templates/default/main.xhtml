@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+ 
+    <h:head>
+        <f:facet name="first">
+            <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+            <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
+            <meta name="viewport" content="width=device-width, initial-scale=1" />	
+ 
+            <title>Twitter crawling with Hibernate Seach - Gianvito Morena</title>
+
+        </f:facet>
+ 
+        <f:facet name="middle">
+            <h:outputStylesheet name="bootstrap/css/bootstrap.css" />
+            <h:outputStylesheet name="css/dashboard.css" />
+            
+            <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js" />
+            <script src="http://maps.google.com/maps/api/js?sensor=false" type="text/javascript" />
+            <h:outputScript name="bootstrap/js/bootstrap.js" />
+
+        </f:facet>
+        
+        <f:facet name="last">
+             <h:outputStylesheet name="css/font-awesome.css" />
+             <h:outputScript name="js/utility.js" target="head"/>
+        </f:facet>
+        
+        <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet" />
+        
+    </h:head>
+ 
+    <h:body>
+       
+       <ui:include src="header.xhtml" />
+       
+       <div class="container-fluid">
+            <div class="row">
+                
+                <ui:include src="leftMenu.xhtml" />
+                
+                <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">                    
+                    <h:panelGroup id="content">
+                        <ui:insert name="content" />
+                    </h:panelGroup>
+                </div>
+    
+            </div>
+        </div>
+    </h:body>
+</html>

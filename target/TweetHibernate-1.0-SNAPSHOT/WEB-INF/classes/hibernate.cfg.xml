@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-configuration SYSTEM 
+"http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+
+<hibernate-configuration>
+	<session-factory>
+		<property name="hibernate.dialect">
+                    org.hibernate.dialect.MySQLDialect
+                </property>
+                
+                <!-- Configurazione del driver di connessione al database -->
+		<property name="hibernate.connection.driver_class">
+                    com.mysql.jdbc.Driver
+                </property>
+
+		<!-- Configurazione del database -->
+		<property name="hibernate.connection.url">
+                    jdbc:mysql://localhost:3309/tweets
+                </property>
+		<property name="hibernate.connection.username"> root </property>
+		<property name="hibernate.connection.password"> password </property>
+		<property name="show_sql">true</property>
+		
+		<!-- Proprieta' di Hibernate Search -->
+		<property name="hibernate.search.default.indexmanager">
+                    near-real-time
+                </property>
+		<property name="hibernate.search.default.locking_strategy">
+                    native
+                </property>
+                <property name="hibernate.search.default.directory_provider">
+                    filesystem
+                </property>
+		<property name="hibernate.search.default.indexBase">
+                    /Users/gianvito/NetBeansProjects/indexes
+                </property>
+                <property name="hibernate.search.default.exclusive_index_use">
+                    false
+                </property>
+                <property name="hibernate.connection.autocommit">true</property> 
+
+
+		<!-- Mapping delle classi in Hibernate -->
+		<mapping resource="com/gianvito/comment/Comment.hbm.xml"/>
+                <mapping resource="com/gianvito/twitter/Tweet.hbm.xml"/>
+                <mapping resource="com/gianvito/twitter/Hashtag.hbm.xml"/>
+                <mapping resource="com/gianvito/twitter/Location.hbm.xml"/>
+
+	</session-factory>
+</hibernate-configuration>
+

@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"  
+      xmlns:f="http://java.sun.com/jsf/core"  
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:ph="http://xmlns.jcp.org/jsf/passthrough"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:pe="http://primefaces.org/ui/extensions">
+    
+
+    <h1 class="page-header "> <i class="fa fa-twitter"></i> Twitter crawling </h1>
+    
+    
+    <h:form id="twitter_search_buttons" class="form-inline" >
+        <fieldset>
+            <div class="form-group">
+                <p:inputText class="form-control" id="searchtext" required="true" requiredMessage="Inserisci il testo da ricercare"
+                             ph:placeholder="Cerca su Twitter" value="#{search.text}"/>
+            </div>
+            <div class="form-group">
+                <p:commandButton class="btn btn-default" value="Cerca su Twitter" ajax="true" update=":tbl" id="searchbutton" actionListener="#{search.search()}">
+                   <f:ajax render=":tbl" execute="@form" />
+                </p:commandButton>
+                <p:spacer width="2" />
+                <p:commandButton id="btn_select_position" class="btn btn-default" type="button" icon="ui-icon-pin-s" value="Posizione" onclick="PF('dlg').show();" />
+            </div>
+            <p:spacer width="50"></p:spacer>
+            <h:selectOneMenu value="#{search.searchTypeNP}" required="true" >
+                <f:selectItem itemLabel="Ricerca mista" itemValue="mixed" />
+                <f:selectItem itemLabel="Ricerca per popolarita'" itemValue="popular" />
+                <f:selectItem itemLabel="Ricerca per tweet piu' recenti" itemValue="recent" />
+            </h:selectOneMenu>
+            <p:spacer width="10"></p:spacer>
+            <h:selectOneMenu value="#{search.countNum}" required="true" >
+                <f:selectItem itemLabel="Numero di risultati (default: 10)" itemValue="10" />
+                <f:selectItem itemLabel="20" itemValue="20" />
+                <f:selectItem itemLabel="50" itemValue="50" />
+                <f:selectItem itemLabel="100" itemValue="100" />
+                <f:selectItem itemLabel="200" itemValue="200" />
+            </h:selectOneMenu>
+            <p:spacer width="10"></p:spacer>
+            <h:selectOneMenu value="#{search.language}" required="true" >
+                <f:selectItem itemLabel="Lingua (default: Italiano)" itemValue="it" />
+                <f:selectItem itemLabel="Tutte" itemValue="all" />
+                <f:selectItem itemLabel="Inglese" itemValue="en" />    
+            </h:selectOneMenu>
+            
+            <p:dialog header="Posizione da ricercare nei tweets" id="gmapDialog" widgetVar="dlg" width="750" height="600" modal="true">
+                <div class="form-group form-group-sm ">
+                    <p:inputText class="form-control" id="indirizzo" ph:placeholder="Via, citta', ecc..."/>
+                    <p:spacer width="10" />
+                    <p:commandButton class="btn btn-default" value="Imposta coordinate" ajax="true" icon="ui-icon-search" onclick="geocode()" type="button"/>
+                    <p:spacer width="10"></p:spacer>
+                    <h:selectOneMenu value="#{search.searchRadius}" required="true" >
+                        <f:selectItem itemLabel="Raggio di ricerca (default = 100 km)" itemValue="100" />
+                        <f:selectItem itemLabel="25 km" itemValue="25" />
+                        <f:selectItem itemLabel="500 km" itemValue="500" />
+                        <f:selectItem itemLabel="1000 km" itemValue="1000" />
+                    </h:selectOneMenu>
+                    <p:spacer width="20"></p:spacer>  
+                    <p:commandLink update="geoGmap" style="float: none">
+                        <div class="fa fa-remove" width="24"/> rimuovi
+                        <p:ajax event="click" listener="#{search.removePosition}" />
+                    </p:commandLink>
+                </div>
+                <p:separator />
+                <p:gmap id="geoGmap" widgetVar="geoMap" center="#{search.centerGeoMap}" zoom="#{search.zoomOnGeoMap}" type="ROADMAP" model="#{search.geoModel}" style="width:700px;height:520px">
+                    <p:ajax event="geocode" listener="#{search.onGeocode}" update="@this" />
+                </p:gmap>
+            </p:dialog>
+        </fieldset>
+        
+    </h:form>
+    <br></br>
+    
+    
+    <h:form id ="tbl">
+        <p:growl id="messages" showDetail="true" life="3000" />
+        
+        <p:dataTable id="tbldata" var="tweet" value="#{search.tweets}"
+                 paginatorTemplate="{Save} {CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                 paginator="true" rows="10" selectionMode="multiple" selection="#{tweetSelView.tweets}" rowKey="#{tweet.id}"
+                 style="margin-bottom:20px">
+
+            <p:column width="170">
+                <f:facet name="header">
+                    <h:outputText value="Id" />
+                </f:facet>
+                <h:outputText value="#{tweet.id}" />
+            </p:column>
+
+            <p:column width="150">
+                <f:facet name="header">
+                    <h:outputText value="Data"/>
+                </f:facet>
+                <h:outputText value="#{tweet.createdAt}" />
+            </p:column>
+
+            <p:column width="150">
+                <f:facet name="header">
+                    <h:outputText value="Utente" />
+                </f:facet>
+                <h:outputText value="#{tweet.utente}" />
+            </p:column>
+
+            <p:column>
+                <f:facet name="header">
+                    <h:outputText value="Testo" />
+                </f:facet>
+                <h:outputText value="#{tweet.testo}" />
+            </p:column>
+            
+            <f:facet name="{Save}">
+                <p:spacer width="10"></p:spacer>  
+                <p:commandLink process="tbldata" update=":tbl:messages" actionListener="#{tweetSelView.saveSelectionOnDB()}" style="float: none">
+                    <div class="fa fa-save" width="24"/> Salva
+                </p:commandLink>
+                <p:spacer width="10"></p:spacer>  
+                <p:commandLink process="tbldata" actionListener="#{search.saveEverythingOnDB()}" style="float: none">
+                    <div class="fa fa-save" width="24"/> Salva tutto
+                </p:commandLink>
+                <p:spacer width="10"></p:spacer>  
+                <p:commandLink process="tbldata" update=":tbl:tweetDetails :tbl:gmap" oncomplete="PF('tweetDetails').show()" style="float: none">
+                    <div class="fa fa-search" width="24"/> Dettagli
+                </p:commandLink>
+                <p:spacer width="10"></p:spacer>  
+                <p:commandLink process="tbldata" update=":tbl :tbl:messages" ajax="true" actionListener="#{search.loadOtherTweets()}" style="float: none">
+                    <div class="fa fa-angle-right" width="24"/> Altri tweet
+                </p:commandLink>
+            </f:facet>
+        </p:dataTable>
+        
+        <p:dialog header="Selected tweets" widgetVar="tweetDetails" modal="true" showEffect="fade" hideEffect="fade" resizable="true" width="1280">
+            <div class="container-fluid">
+                 <div class="col-md-6">
+                     <p:gmap id="gmap" center="#{tweetSelView.centerLat}, #{tweetSelView.centerLon}" zoom="2" type="HYBRID" model="#{tweetSelView.advancedModel}" style="width:600px;height:400px" >
+                        <p:ajax event="overlaySelect" listener="#{tweetSelView.onMarkerSelect}" />
+                        <p:gmapInfoWindow id="infoWindow">
+                            <p:outputPanel style="text-align: center; display: block; margin: auto">
+                                <h:outputText value="#{tweetSelView.marker.title}" />
+                            </p:outputPanel>
+                        </p:gmapInfoWindow>
+                     </p:gmap>
+                </div>
+                <div class="col-md-6">
+                     <p:outputPanel id="tweetDetails" style="text-align:center;">
+                        <ui:repeat value="#{tweetSelView.tweets}" var="selTweetDB">
+                            <h:outputText value="@#{selTweetDB.utente} ---> #{selTweetDB.testo}" style="display:block"/>
+                            <p:separator />
+                        </ui:repeat>
+                    </p:outputPanel>
+                </div>
+            </div> 
+        </p:dialog>
+        
+    </h:form> 
+</html>

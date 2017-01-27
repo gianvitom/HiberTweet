@@ -1,0 +1,55 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+ 
+    <ui:composition id="leftcomposition">
+        
+        <div class="col-sm-3 col-md-2 sidebar">
+            <h:form id="formMenu">
+
+                <p:commandLink action="#{pageController.setPageWelcome()}" update=":content" >
+                    <h:outputText class="fa fa-home" value="    Pagina di benvenuto" />
+                </p:commandLink>
+                <br></br>
+                <br></br>
+                <p:commandLink action="#{pageController.setPageInsertData()}" update=":content" >
+                    <h:outputText class="fa fa-edit" value="    Inserisci dati nel DB" />
+                </p:commandLink>
+                <br></br>
+                <br></br>
+                <p:commandLink action="#{pageController.setPageShowResults()}" update=":content">
+                    <h:outputText class="fa fa-list" value="    Mostra dati dal DB" />
+                </p:commandLink> 
+                <br></br>
+                <br></br>
+                <p:commandLink action="#{pageController.setPagePrintTwitter()}" update=":content" >
+                    <h:outputText class="fa fa-twitter" value="    Ricerca su Twitter" />
+                </p:commandLink>
+                <br></br>
+                <br></br>
+                <p:commandLink action="#{pageController.setPageTweetsInDB()}" update=":content" >
+                    <h:outputText class="fa fa-twitter-square" value="    Ricerca tweet nel DB" />
+                </p:commandLink>
+                <br></br>
+                <br></br>
+                <div class="bottomaligned">
+                    <p:commandLink action="#{searchDB.dataIndex()}" update=":content" >
+                        <h:outputText class="fa fa-database" value="    Indicizza DB" />
+                    </p:commandLink>
+                    <br></br>
+                    <br></br>
+                    <p:commandLink action="#{searchDB.rebootHS()}" update=":content" >
+                        <h:outputText class="fa fa-repeat" value="    Riavvia HS" />
+                    </p:commandLink>
+                    <br></br>
+                    <br></br>
+                    <p:commandLink action="#{searchDB.closeHS()}" update=":content" >
+                        <h:outputText class="fa fa-power-off" value="    Rilascia write-lock su HS" />
+                    </p:commandLink>
+                </div>
+            </h:form>
+        </div>    
+    </ui:composition>
+</html>

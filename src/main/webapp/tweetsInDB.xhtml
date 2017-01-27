@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"  
+      xmlns:f="http://java.sun.com/jsf/core"  
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:ph="http://xmlns.jcp.org/jsf/passthrough"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:pe="http://primefaces.org/ui/extensions" >
+
+    <h1 class="page-header "> <i class="fa fa-twitter-square"></i> Tweet search con Hibernate Search </h1>
+    
+    <h:form id="searchbox" class="form-inline" >
+        <fieldset>            
+            <div class="form-group">
+                <p:inputText class="form-control" id="searchtextDB" requiredMessage="Inserisci il testo da ricercare"
+                             ph:placeholder="Testo da ricercare..." value="#{searchDB.text}"/>
+            </div>
+            <div class="form-group">
+                <p:commandButton value="Ricerca" id="searchbutton" ajax="true" class="btn btn-default" update=":tblDB :tblDB:messages" actionListener="#{searchDB.search()}">
+                   <f:ajax render="tblDB" execute="@form" />
+                </p:commandButton>
+            </div>
+            <div class="form-group">
+                <p:commandButton id="btn_select_positionDB" class="btn btn-default" type="button" icon="ui-icon-pin-s" value="Posizione" onclick="PF('dlgDB').show();" />
+            </div>
+            <p:spacer width="20"></p:spacer>
+            <h:selectOneMenu id="single_search_list" value="#{searchDB.searchType}" required="true" disabled="#{searchDB.multipleSearch}" >
+                <f:selectItem itemLabel="Query normale" itemValue="normale" />
+                <f:selectItem itemLabel="Query fuzzy" itemValue="fuzzy" />
+                <f:selectItem itemLabel="Query wildcard" itemValue="wildcard" />
+                <f:selectItem itemLabel="Ricerca di una frase (con slop)" itemValue="frase" />
+                <f:selectItem itemLabel="Approssimazione fonetica" itemValue="fonetica" />
+                <f:selectItem itemLabel="Sinonimi" itemValue="sinonimi" />
+                <f:selectItem itemLabel="Ricerca spaziale" itemValue="spaziale" />
+            </h:selectOneMenu>
+            <p:spacer width="30"></p:spacer>
+            <label> Ricerche multiple:</label>
+                <p:spacer width="10"></p:spacer>
+                <p:selectBooleanCheckbox value="#{searchDB.multipleSearch}" >
+                    <p:ajax update="single_search_list btn_multiple_choice" listener="#{searchDB.isMultipleSearch}" />
+                </p:selectBooleanCheckbox>
+            <p:spacer width="10"></p:spacer>
+            <div class="form-group">
+                <p:commandButton icon="ui-icon-pencil" id="btn_multiple_choice" disabled="#{!searchDB.multipleSearch}" class="btn btn-default" type="button" value="Opzioni" onclick="PF('dlgMC').show();" />
+            </div>
+            <p:spacer width="30"></p:spacer>
+            <h:selectOneMenu value="#{searchDB.resultNum}" required="true" >
+                <f:selectItem itemLabel="Risultati (default: 10)" itemValue="10" />
+                <f:selectItem itemLabel="20" itemValue="20" />
+                <f:selectItem itemLabel="50" itemValue="50" />
+                <f:selectItem itemLabel="100" itemValue="100" />
+                <f:selectItem itemLabel="200" itemValue="200" />
+            </h:selectOneMenu>
+            <!--
+            <pe:ajaxErrorHandler title="Error"  
+                body="Server return exception  {error-name} with description &lt;b&gt;{error-message}&lt;/b&gt;" button="Hide"  
+                widgetVar="myAjaxErrorHandler" buttonOnclick="myAjaxErrorHandler.hide()" />  
+            -->
+            <p:dialog header="Posizione da ricercare nei tweets salvati nel DB" id="gmapDialogDB" widgetVar="dlgDB" width="750" height="600" modal="true">
+                <div class="form-group form-group-sm ">
+                    <p:inputText class="form-control" id="indirizzo" ph:placeholder="Via, citta', ecc..."/>
+                    <p:spacer width="2" />
+                    <p:commandButton class="btn btn-default" value="Imposta coordinate" icon="ui-icon-search" onclick="geocodeDB()" type="button" />
+                    <p:spacer width="10"></p:spacer>
+                    <h:selectOneMenu value="#{searchDB.searchRadius}" required="true" >
+                        <f:selectItem itemLabel="Raggio di ricerca (default = 100 km)" itemValue="100" />
+                        <f:selectItem itemLabel="25 km" itemValue="25" />
+                        <f:selectItem itemLabel="500 km" itemValue="500" />
+                        <f:selectItem itemLabel="1000 km" itemValue="1000" />
+                    </h:selectOneMenu>
+                    <p:spacer width="20"></p:spacer>  
+                    <p:commandLink update="geoGmapDB" style="float: none">
+                        <div class="fa fa-remove" width="24"/> rimuovi
+                        <p:ajax event="click" listener="#{searchDB.removePosition}" />
+                    </p:commandLink>
+                </div>
+                <p:separator />
+                <p:gmap id="geoGmapDB" widgetVar="geoMapDB" center="#{searchDB.centerGeoMap}" zoom="#{searchDB.zoomOnGeoMap}" type="ROADMAP" model="#{searchDB.geoModel}" style="width:700px;height:520px">
+                    <p:ajax event="geocode" listener="#{searchDB.onGeocode}" update="@this" />
+                </p:gmap>
+            </p:dialog>
+            <p:dialog header="Seleziona le opzioni di ricerca" id="dialog_multiple_choise" widgetVar="dlgMC" width="750" height="370" modal="true">
+                <label> Condizione booleana di join tra le query: </label>
+                <p:spacer width="20"></p:spacer>
+                <div class="form-group">
+                    <h:selectOneMenu value="#{searchDB.booleanChoice}" required="true" >
+                        <f:selectItem itemLabel="AND" itemValue="AND" />
+                        <f:selectItem itemLabel="OR" itemValue="OR" />
+                    </h:selectOneMenu>
+                </div>
+                <p:separator />
+                <label> Seleziona le ricerche da effettuare: </label>
+                <p:spacer width="20"></p:spacer>  
+                <div class="form-group checkbox">
+                    <p:selectManyCheckbox id="multiple_choice_checkbox" value="#{searchDB.multipleChoiceList}" layout="pageDirection">
+                        <f:selectItem itemLabel="Query normale" itemValue="normale" />
+                        <f:selectItem itemLabel="Query fuzzy" itemValue="fuzzy" />
+                        <f:selectItem itemLabel="Query wildcard" itemValue="wildcard" />
+                        <f:selectItem itemLabel="Ricerca di una frase (con slop)" itemValue="frase" />
+                        <f:selectItem itemLabel="Approssimazione fonetica" itemValue="fonetica" />
+                        <f:selectItem itemLabel="Sinonimi" itemValue="sinonimi" />
+                        <f:selectItem itemLabel="Ricerca spaziale" itemValue="spaziale" />
+                    </p:selectManyCheckbox>
+                </div>
+            </p:dialog>
+        </fieldset>
+    </h:form>
+    <br></br>
+    
+    <h:form id ="tblDB">
+        <p:dataTable id="tbldataDB" var="tweet" value="#{searchDB.tweets}"
+                 paginatorTemplate="{Details} {CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                 paginator="true" rows="10" selectionMode="multiple" selection="#{tweetSelViewDB.tweets}" rowKey="#{tweet.id}"
+                 style="margin-bottom:20px" rowsPerPageTemplate="10,20,50,100">
+            <f:facet name="{Exporters}">
+                <h:commandLink>
+                    <div class="fa fa-file-pdf-o" width="24"/>
+                    <p:dataExporter type="pdf" target="tbl" fileName="twitter" />
+                </h:commandLink>
+               
+            </f:facet>
+
+            <p:column width="170">
+                <f:facet name="header">
+                    <h:outputText value="Id" />
+                </f:facet>
+                <h:outputText value="#{tweet.id}" />
+            </p:column>
+
+            <p:column width="150">
+                <f:facet name="header">
+                    <h:outputText value="Data"/>
+                </f:facet>
+                <h:outputText value="#{tweet.createdAt}" />
+            </p:column>
+
+            <p:column width="150">
+                <f:facet name="header">
+                    <h:outputText value="Utente" />
+                </f:facet>
+                <h:outputText value="#{tweet.utente}" />
+            </p:column>
+
+            <p:column>
+                <f:facet name="header">
+                    <h:outputText value="Testo" />
+                </f:facet>
+                <h:outputText value="#{tweet.testo}" />
+            </p:column>
+            
+            
+            <f:facet name="{Details}">
+                <p:commandLink process="tbldataDB" update=":tblDB:tweetDetailsDB :tblDB:gmap" oncomplete="PF('tweetDetailsDB').show()" style="float: none">
+                    <div class="fa fa-search" width="24"/> Dettagli
+                </p:commandLink>
+                <p:spacer width="10"></p:spacer>
+                <p:commandLink process="tbldataDB" update=":tblDB :tblDB:messages" ajax="true" actionListener="#{searchDB.loadOtherTweets()}" style="float: none">
+                    <div class="fa fa-angle-right" width="24"/> Altri tweet
+                </p:commandLink>
+                <p:spacer width="10"></p:spacer>  
+            </f:facet>
+        </p:dataTable>
+        
+        <p:dialog header="Selected tweets" widgetVar="tweetDetailsDB" modal="true" showEffect="fade" hideEffect="fade" resizable="true" width="1280">
+            <div class="container-fluid">
+                 <div class="col-md-6">
+                     <p:gmap id="gmap" center="#{tweetSelViewDB.centerLat}, #{tweetSelViewDB.centerLon}" zoom="2" type="ROADMAP" model="#{tweetSelViewDB.advancedModel}" style="width:600px;height:400px" >
+                        <p:ajax event="overlaySelect" listener="#{tweetSelViewDB.onMarkerSelect}" />
+                        <p:gmapInfoWindow id="infoWindow">
+                            <p:outputPanel style="text-align: center; display: block; margin: auto">
+                                <h:outputText value="#{tweetSelViewDB.marker.title}" />
+                            </p:outputPanel>
+                        </p:gmapInfoWindow>
+                     </p:gmap>
+                </div>
+                <div class="col-md-6">
+                     <p:outputPanel id="tweetDetailsDB" style="text-align:center;">
+                        <ui:repeat value="#{tweetSelViewDB.tweets}" var="selTweetDB">
+                            <h:outputText value="@#{selTweetDB.utente} ---> #{selTweetDB.testo}" style="display:block"/>
+                            <ui:repeat value="#{selTweetDB.hashtags}" var="hashtag">
+                                <h:outputText value="##{hashtag.hashtag}  " />
+                            </ui:repeat>
+                            <p:separator />
+                        </ui:repeat>
+                    </p:outputPanel>
+                </div>
+            </div> 
+        </p:dialog>
+        
+        <p:growl id="messages" showDetail="true" life="3000" />
+    </h:form>
+</html>

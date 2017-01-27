@@ -1,0 +1,184 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : Nov 12, 2014, 5:40:37 PM
+    Author     : gianvito
+*/
+
+/*
+ * Struttura base
+ */
+ 
+/* Spostiamo il contenuto in basso dato che abbiamo una header alta 50 px */
+body {
+  padding-top: 50px;
+}
+
+/*
+ * Possibili testi secondari
+ */
+.sub-header {
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eee;
+}
+ 
+/*
+ * Barra laterale
+ */
+.sidebar {
+  display: none;
+}
+@media (min-width: 768px) {
+  .sidebar {
+    position: fixed;
+    top: 51px;
+    bottom: 0;
+    left: 0;
+    z-index: 1000;
+    display: block;
+    padding: 20px;
+    overflow-x: hidden;
+    overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
+    background-color: #f5f5f5;
+    border-right: 1px solid #eee;
+  }
+}
+ 
+/* Altre impostazioni */
+.nav-sidebar {
+  margin-right: -21px; /* 20px padding + 1px border */
+  margin-bottom: 20px;
+  margin-left: -20px;
+}
+.nav-sidebar > li > a {
+  padding-right: 20px;
+  padding-left: 20px;
+}
+.nav-sidebar > .active > a {
+  color: #fff;
+  background-color: #428bca;
+}
+ 
+ 
+/*
+ * Contenuto principale
+ */
+.main {
+  padding: 20px;
+}
+@media (min-width: 768px) {
+  .main {
+    padding-right: 40px;
+    padding-left: 40px;
+  }
+}
+.main .page-header {
+  margin-top: 0;
+}
+ 
+ 
+/*
+ * Altre impostazioni
+ */
+.placeholders {
+  margin-bottom: 30px;
+  text-align: center;
+}
+.placeholders h4 {
+  margin-bottom: 0;
+}
+.placeholder {
+  margin-bottom: 20px;
+}
+.placeholder img {
+  display: inline-block;
+  border-radius: 50%;
+}
+ 
+/*
+    Impostazioni dei pannelli di notifica
+*/
+div[id="tbl:messages_container"]{
+    position: absolute;
+    top: 57px;
+}
+
+div[id="tblDB:messages_container"]{
+    position: absolute;
+    top: 57px;
+}
+
+div[id="searchbox:messages_container"]{
+    position: absolute;
+    top: 57px;
+}
+
+div[id="insert_comment_box:messages_container"]{
+    position: absolute;
+    top: 57px;
+}
+
+/*
+    Altre impostazioni
+*/
+.bottomaligned {
+    position:absolute;
+    bottom:20px;
+}
+.ui-selectcheckboxmenu{
+	background-color: #ffffff;
+	font-size: x-small;
+	line-height: normal;
+	font-weight: normal;
+	font-style: normal;
+	text-decoration: none;
+	font-variant: normal;
+	text-transform: none;
+	width: 30%;
+	height: 30%;
+}
+ui-selectcheckboxmenu-label{
+	width: 10%;
+	height: 10%;
+	background-color: #ffffff;
+}
+.ui-selectcheckboxmenu-trigger{
+	width: 10%;
+	height: 10%;
+}
+.ui-selectcheckboxmenu-label-container{
+
+}
+.ui-selectcheckboxmenu-panel{
+
+	background-color: #ffffff;
+}
+.ui-selectcheckboxmenu-items{
+	font-size: small;
+	font-size: small;
+	font-weight: normal;
+	font-style: normal;
+	text-decoration: none;
+	font-variant: normal;
+	text-transform: none;
+	line-height: normal;
+}
+.ui-selectcheckboxmenu-item{
+	font-size: small;
+	font-weight: normal;
+	font-style: normal;
+	text-decoration: none;
+	font-variant: normal;
+	text-transform: none;
+	line-height: normal;
+}
+.ui-chkbox{
+    padding-right: 3px;
+    padding-top: 7px;
+}
+.ui-radiobutton{
+    padding-right: 3px;
+}
